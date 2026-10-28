@@ -1,11 +1,98 @@
-<div align="center">
+# ZamZam Disposable & Shopping Bags Center - Khata & POS App
 
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
+مکمل کاروباری حساب کتاب، بلنگ، اسٹاک مینجمنٹ، یومیہ و ماہانہ رپورٹس، پن کوڈ لاک، اور آف لائن پی ڈبلیو اے ایپ۔
 
-  <h1>Built with AI Studio</h2>
+---
 
-  <p>The fastest path from prompt to production with Gemini.</p>
+## 🚀 چلانے کا طریقہ (How to Run Locally)
 
-  <a href="https://aistudio.google.com/apps">Start building</a>
+### ضروریات (Prerequisites):
+- [Node.js](https://nodejs.org/) (Version 18 یا نیا)
+- [NPM](https://www.npmjs.com/) (Node.js کے ساتھ خودکار انسٹال ہوتا ہے)
 
-</div>
+### طریقہ کار (Steps):
+
+1. **تمام فائلز ڈاؤنلوڈ یا ان زپ کریں (Extract Files)**:
+   ```bash
+   cd zamzam-khata-app
+   ```
+
+2. **ڈپینڈینسیز انسٹال کریں (Install Dependencies)**:
+   ```bash
+   npm install
+   ```
+
+3. **لوکل سرور شروع کریں (Run Development Server)**:
+   ```bash
+   npm run dev
+   ```
+   آپ کی ایپ `http://localhost:3000` پر چل پڑے گی۔
+
+4. **پروڈکشن کے لیے بلڈ تیار کریں (Build for Production)**:
+   ```bash
+   npm run build
+   ```
+   اس سے `dist/` فولڈر میں تیار شدہ، تیز رفتار ویب فائلز بن جائیں گی جنہیں کسی بھی ہوسٹنگ (Vercel, Netlify, Cloud Run, cPanel) پر اپلوڈ کیا جا سکتا ہے۔
+
+---
+
+## 📱 بغیر انٹرنیٹ / سنگل فائل آف لائن موبائل ایپ (Zero-Install HTML)
+
+اگر آپ کے پاس Node.js نہیں ہے اور آپ فوراً موبائل یا کمپیوٹر پر ایپ بغیر کسی سافٹ ویئر کے چلانا چاہتے ہیں:
+- فائل کھولیں: `public/zamzam_disposable.html`
+- اسے اپنے موبائل کے واٹس ایپ پر بھیجیں یا فائل مینیجر سے کھولیں (Chrome براؤزر میں کھلے گی)۔
+- یہ 100% مکمل آف لائن چلتی ہے، اس میں آپ کا ڈیٹا موبائل کی میموری (LocalStorage) میں محفوظ رہتا ہے۔
+
+---
+
+## 📁 پراجیکٹ کا اسٹرکچر (Project Structure)
+
+```text
+├── index.html                    # مین HTML فریم
+├── package.json                  # ڈپینڈینسیز اور اسکرپٹس
+├── vite.config.ts                # وائٹ کنفیگریشن
+├── tsconfig.json                 # ٹائپ اسکرپٹ سیٹنگز
+├── public/                       # لوگو، آئیکنز، PWA مینیفیسٹ، سروس ورکر
+│   ├── zamzam_logo.png           # اصل ٹرانسپیرنٹ زم زم لوگو
+│   ├── zamzam_logo_square.png    # لوگو بیج
+│   ├── manifest.json             # PWA ویب مینیفیسٹ
+│   ├── sw.js                     # آف لائن سروس ورکر
+│   ├── zamzam_disposable.html    # سنگل فائل مکمل آف لائن ایپ
+│   └── zamzam_khata_source_code.zip # مکمل کوڈ زپ پیکج
+└── src/
+    ├── main.tsx                  # ایپ کا انٹری پوائنٹ
+    ├── App.tsx                   # مین نیویگیشن، باٹم ٹیب بار، موڈلز
+    ├── index.css                 # ٹیل ونڈ CSS
+    ├── types/
+    │   └── index.ts              # تمام ڈیٹا ماڈلز (پروڈکٹ، سیل، کسٹمر، پن وغیرہ)
+    ├── context/
+    │   └── KhataContext.tsx      # مکمل ڈیٹا اسٹور، کیلکولیشنز، اور لوکل اسٹوریج
+    ├── components/
+    │   ├── Header.tsx            # اوپر والا ہیڈر، لوگو، فون نمبرز، فوری ایکشنز
+    │   ├── DashboardView.tsx     # آج کا روزنامچہ، آمدن، منافع، خریدار کارڈز
+    │   ├── SalesView.tsx         # پوائنٹ آف سیل (POS)، کیٹلاگ، کارٹ، بلنگ
+    │   ├── InvoiceReceiptModal.tsx # رنگین اور دلچسپ بل رسیٹس (4 تھیمز، QR کوڈ)
+    │   ├── InventoryView.tsx     # اسٹاک کا ریکارڈ، الرٹس، CSV بلک اپلوڈ
+    │   ├── CsvImportModal.tsx    # CSV فائل سے بلک پروڈکٹس امپورٹ
+    │   ├── ExpensesView.tsx      # دکان کے تمام اخراجات کی تفصیل
+    │   ├── KhataView.tsx         # ادھار کھاتہ، کسٹمر لیجر، واٹس ایپ ریمائنڈر
+    │   ├── ReportsView.tsx       # ہفتہ وار اور ماہانہ منافع و نقصان رپورٹس
+    │   ├── SecurityLock.tsx      # پن کوڈ اور فنگر پرنٹ سیکیورٹی اسکرین
+    │   ├── SettingsView.tsx      # بیک اپ، دکان کا نام و پتہ، فون، ڈیٹا ری سیٹ
+    │   ├── InstallAppBanner.tsx  # موبائل انسٹالیشن بینر
+    │   └── MobileInstallGuideModal.tsx # اینڈرائیڈ / کروم انسٹال کرنے کا مکمل طریقہ
+    └── utils/
+        ├── storage.ts            # ڈیٹا اسٹوریج، بیک اپ ڈاؤنلوڈ و بحالی
+        └── translations.ts       # رومن اردو، اردو اور انگریزی ترجمہ
+```
+
+---
+
+## 🌟 نمایاں خصوصیات (Key Features)
+
+1. **روزنامچہ (Daily Dashboard)**: آج کی کل فروخت، اخراجات، خالص منافع، اور موجودہ کیش۔
+2. **رنگین اور خوبصورت رسیدیں (Modern Invoices)**: 4 پرکشش کلر تھیمز (زم زم ایمرلڈ، شاہی رائل نیلوی، ماڈرن سلیٹ، ہائی کنٹراسٹ مونو)، بارکوڈ / کیو آر کوڈ، واٹس ایپ شیئر، اور امیج / پی ڈی ایف ڈاؤنلوڈ۔
+3. **بلک CSV امپورٹ (CSV Bulk Stock Upload)**: ایکسل یا شیٹ سے تمام اشیاء ایک ساتھ اپنے اسٹاک میں شامل کرنے کی سہولت۔
+4. **ادھار کھاتہ اور واٹس ایپ (Khata & WhatsApp)**: ہر کسٹمر کا الگ کھاتہ، باقی ادھار کا حساب، اور ایک کلک سے واٹس ایپ پر ریمائنڈر بھیجنے کا بٹن۔
+5. **پن کوڈ سیکیورٹی (Security PIN)**: 4 ہندسوں کا خفیہ پن کوڈ اور بائیو میٹرک ان لاک۔
+6. **بیک اپ اور بحالی (Backup & Restore)**: تمام ڈیٹا اپنے فون یا کمپیوٹر پر JSON فارمیٹ میں محفوظ کریں اور جب چاہیں واپس لے آئیں۔

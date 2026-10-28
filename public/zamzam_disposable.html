@@ -1,0 +1,1346 @@
+<!DOCTYPE html>
+<html lang="ur" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ZamZam Disposable and Shopping bags center - Hisab Kitab</title>
+  <meta name="description" content="Offline standalone HTML business khata and receipt maker for ZamZam Disposable & Shopping Bags Center.">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='20' fill='%23059669'/><text x='50' y='65' font-size='50' font-weight='bold' fill='white' text-anchor='middle'>₨</text></svg>">
+  <style>
+    /* Reset & Base */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Plus Jakarta Sans", sans-serif;
+      background-color: #020617;
+      color: #f1f5f9;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+    input, button, select, textarea { font-family: inherit; font-size: inherit; }
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    
+    /* Layout */
+    .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+    .header {
+      background: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid #1e293b;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(8px);
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0.75rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+    .brand-wrap { display: flex; align-items: center; gap: 0.75rem; }
+    .brand-logo {
+      width: 40px; height: 40px; border-radius: 10px; background: #059669;
+      display: flex; align-items: center; justify-content: center;
+      color: #fff; font-weight: 800; font-size: 1.25rem; flex-shrink: 0;
+    }
+    .brand-text h1 { font-size: 1rem; font-weight: 800; color: #fff; line-height: 1.2; }
+    .brand-text p { font-size: 0.75rem; color: #34d399; font-weight: 600; font-family: monospace; }
+    
+    /* Nav */
+    .nav-tabs {
+      display: flex; gap: 0.25rem; overflow-x: auto; padding: 0.5rem 1rem;
+      background: #0f172a; border-bottom: 1px solid #1e293b;
+    }
+    .tab-btn {
+      padding: 0.4rem 0.75rem; border-radius: 8px; border: 1px solid transparent;
+      background: transparent; color: #94a3b8; font-size: 0.8rem; font-weight: 700;
+      cursor: pointer; white-space: nowrap; transition: 0.2s;
+    }
+    .tab-btn:hover { color: #fff; background: rgba(255,255,255,0.05); }
+    .tab-btn.active {
+      background: rgba(16, 185, 129, 0.15); color: #34d399; border-color: rgba(16, 185, 129, 0.3);
+    }
+
+    /* Cards & Grids */
+    .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    .grid-4 { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 0.75rem; }
+    .card {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 14px; padding: 1rem;
+    }
+    .card-title { font-size: 0.75rem; font-weight: 600; color: #94a3b8; text-transform: uppercase; }
+    .card-val { font-size: 1.5rem; font-weight: 800; color: #fff; margin-top: 0.25rem; }
+    
+    /* Buttons */
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 0.4rem;
+      padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; font-size: 0.8rem;
+      cursor: pointer; border: none; transition: 0.15s;
+    }
+    .btn-emerald { background: #059669; color: #fff; }
+    .btn-emerald:hover { background: #047857; }
+    .btn-slate { background: #1e293b; color: #cbd5e1; border: 1px solid #334155; }
+    .btn-slate:hover { background: #334155; color: #fff; }
+    .btn-rose { background: #dc2626; color: #fff; }
+    .btn-rose:hover { background: #b91c1c; }
+    
+    /* Tables */
+    .table-wrap { overflow-x: auto; border: 1px solid #1e293b; border-radius: 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.8rem; text-align: left; }
+    th { padding: 0.75rem; background: #1e293b; color: #94a3b8; font-weight: 600; }
+    td { padding: 0.75rem; border-bottom: 1px solid #1e293b; }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .text-right { text-align: right; }
+    .text-center { text-align: center; }
+
+    /* Inputs */
+    .input {
+      width: 100%; padding: 0.5rem 0.75rem; background: #1e293b; border: 1px solid #334155;
+      border-radius: 8px; color: #fff; font-size: 0.85rem; outline: none;
+    }
+    .input:focus { border-color: #10b981; }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 50;
+      display: none; align-items: center; justify-content: center; padding: 1rem;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal-box {
+      background: #0f172a; border: 1px solid #1e293b; border-radius: 16px;
+      width: 100%; max-width: 500px; max-height: 90vh; overflow-y: auto; padding: 1.25rem;
+    }
+
+    /* Printable Thermal Receipt */
+    @media print {
+      body * { visibility: hidden; }
+      #printable-receipt-area, #printable-receipt-area * { visibility: visible; }
+      #printable-receipt-area {
+        position: absolute; left: 0; top: 0; width: 100%; max-width: 80mm;
+        margin: 0 auto; padding: 10px; color: #000 !important; background: #fff !important;
+      }
+      .no-print { display: none !important; }
+    }
+    .receipt-paper {
+      background: #fff; color: #0f172a; padding: 1.25rem; border-radius: 10px;
+      max-width: 340px; margin: 0 auto; font-size: 0.75rem; font-family: monospace;
+    }
+    .receipt-line { border-bottom: 1px dashed #94a3b8; margin: 0.5rem 0; }
+  </style>
+</head>
+<body>
+
+  <!-- Top Header -->
+  <header class="header no-print">
+    <div class="header-inner">
+      <div class="brand-wrap">
+        <div class="brand-logo" style="background: #fff; padding: 2px; border: 1px solid rgba(255,255,255,0.2);">
+          <img src="/zamzam_logo.png" alt="ZamZam Logo" style="width: 100%; height: 100%; object-fit: contain;">
+        </div>
+        <div class="brand-text">
+          <h1>ZamZam Disposable and Shopping bags center</h1>
+          <p>WhatsApp: 03145725727 / 03129077476</p>
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.5rem; align-items: center;">
+        <button class="btn btn-emerald" onclick="switchTab('pos')">+ Naya Bill (POS)</button>
+        <button class="btn btn-slate" onclick="downloadThisHtmlFile()" title="Download Single File HTML">📥 Save HTML</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="nav-tabs no-print">
+    <button class="tab-btn active" onclick="switchTab('dashboard')">Roznamcha (Dashboard)</button>
+    <button class="tab-btn" onclick="switchTab('pos')">Bikri & Bill (POS)</button>
+    <button class="tab-btn" onclick="switchTab('weekly')">Haftawar Record (Weekly)</button>
+    <button class="tab-btn" onclick="switchTab('monthly')">Mahana Record (Monthly)</button>
+    <button class="tab-btn" onclick="switchTab('stock')">Stock / Maal</button>
+    <button class="tab-btn" onclick="switchTab('expenses')">Kharchay</button>
+    <button class="tab-btn" onclick="switchTab('khata')">Udhaar Khata</button>
+    <button class="tab-btn" onclick="switchTab('settings')">Settings & Backup</button>
+  </nav>
+
+  <!-- Main Viewport -->
+  <main class="container">
+
+    <!-- 1. DASHBOARD VIEW -->
+    <section id="view-dashboard">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800;">Aaj Ka Roznamcha</h2>
+          <p style="font-size: 0.8rem; color: #94a3b8;" id="dash-date-str"></p>
+        </div>
+        <button class="btn btn-slate" onclick="switchTab('weekly')">📅 Weekly & Monthly Record &rarr;</button>
+      </div>
+
+      <!-- KPI Grid -->
+      <div class="grid-4" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <div class="card-title">Aaj Ki Bikri</div>
+          <div class="card-val" id="dash-today-sales">₨ 0</div>
+          <div style="font-size: 0.75rem; color: #34d399; margin-top: 0.25rem;" id="dash-sales-count">0 Bills</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Aaj Ke Kharchay</div>
+          <div class="card-val" style="color: #f87171;" id="dash-today-expenses">₨ 0</div>
+          <div style="font-size: 0.75rem; color: #f87171; margin-top: 0.25rem;">Dukan ke kharchay</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Aaj Ka Khalis Nafa</div>
+          <div class="card-val" style="color: #34d399;" id="dash-today-profit">₨ 0</div>
+          <div style="font-size: 0.75rem; color: #94a3b8; margin-top: 0.25rem;">Bikri Nafa - Kharchay</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Kul Udhaar (Lena Hai)</div>
+          <div class="card-val" style="color: #fbbf24;" id="dash-total-udhaar">₨ 0</div>
+          <div style="font-size: 0.75rem; color: #fbbf24; margin-top: 0.25rem;">Grahakon ke zimme</div>
+        </div>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="card" style="margin-bottom: 1.5rem; display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; justify-content: space-between;">
+        <div>
+          <div style="font-weight: 700; font-size: 0.9rem;">ZamZam Disposable Fast Actions</div>
+          <div style="font-size: 0.75rem; color: #94a3b8;">Shopping bags, cups, plates, boxes aur khata manage karein</div>
+        </div>
+        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+          <button class="btn btn-emerald" onclick="switchTab('pos')">🛒 Naya Bill Banayein</button>
+          <button class="btn btn-slate" onclick="openExpenseModal()">💸 Kharcha Likhein</button>
+          <button class="btn btn-slate" onclick="openStockInModal()">📦 Maal Aya (Stock In)</button>
+          <button class="btn btn-slate" onclick="openPaymentModal()">💰 Wasooli Darj Karein</button>
+        </div>
+      </div>
+
+      <!-- Recent Sales List -->
+      <div class="card">
+        <h3 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem;">Aaj Ki Taza Bikri (Recent Bills)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Bill #</th>
+                <th>Waqt</th>
+                <th>Grahak (Customer)</th>
+                <th>Adaigi</th>
+                <th class="text-right">Meezan</th>
+                <th class="text-right">Nafa</th>
+                <th class="text-center">Action</th>
+              </tr>
+            </thead>
+            <tbody id="dash-recent-sales-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. POS / BILL GENERATION VIEW -->
+    <section id="view-pos" style="display: none;">
+      <div class="grid-2">
+        <!-- Products selection -->
+        <div>
+          <div style="display: flex; gap: 0.5rem; margin-bottom: 0.75rem;">
+            <input type="text" id="pos-search" class="input" placeholder="Cheez ka naam ya size (8x10, plates, glasses) talash karein..." oninput="renderPosProducts()">
+          </div>
+          <div class="grid-2" id="pos-products-grid" style="max-height: 550px; overflow-y: auto;">
+            <!-- Rendered via JS -->
+          </div>
+        </div>
+
+        <!-- Current Cart / Bill -->
+        <div class="card" style="display: flex; flex-col; justify-content: space-between;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #1e293b; padding-bottom: 0.5rem;">
+              <h3 style="font-weight: 800; font-size: 1rem;">Mojooda Bill (Cart)</h3>
+              <button class="btn btn-slate" style="padding: 0.2rem 0.5rem; font-size: 0.75rem;" onclick="clearCart()">Khali Karein</button>
+            </div>
+            
+            <div id="pos-cart-list" style="max-height: 220px; overflow-y: auto; margin: 0.5rem 0;">
+              <!-- Rendered via JS -->
+            </div>
+          </div>
+
+          <div style="border-top: 1px solid #1e293b; padding-top: 0.75rem; display: flex; flex-direction: column; gap: 0.5rem;">
+            <!-- Customer -->
+            <div>
+              <label style="font-size: 0.75rem; color: #94a3b8; display: block; margin-bottom: 0.2rem;">Grahak (Customer):</label>
+              <input type="text" id="pos-cust-name" class="input" placeholder="Grahak ka naam (Walk-in / Hotel / Bakery)">
+            </div>
+            <div>
+              <label style="font-size: 0.75rem; color: #94a3b8; display: block; margin-bottom: 0.2rem;">Customer Mobile / WhatsApp:</label>
+              <input type="text" id="pos-cust-phone" class="input" placeholder="0300-1234567">
+            </div>
+
+            <!-- Payment Mode -->
+            <div>
+              <label style="font-size: 0.75rem; color: #94a3b8; display: block; margin-bottom: 0.2rem;">Adaigi (Payment Method):</label>
+              <select id="pos-payment-mode" class="input" onchange="updateCartTotals()">
+                <option value="cash">Naqad (Cash)</option>
+                <option value="credit">Udhaar (Credit Khata)</option>
+                <option value="bank">Online / Bank Transfer</option>
+              </select>
+            </div>
+
+            <!-- Discount & Totals -->
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem;">
+              <span style="color: #94a3b8;">Chhoot (Discount Rs):</span>
+              <input type="number" id="pos-discount" class="input" style="width: 100px; text-align: right;" value="0" min="0" oninput="updateCartTotals()">
+            </div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 1.1rem; font-weight: 800; background: rgba(5, 150, 105, 0.15); padding: 0.5rem; border-radius: 8px; border: 1px solid rgba(5, 150, 105, 0.3);">
+              <span>Kul Raqam (Net):</span>
+              <span id="pos-net-total" style="color: #34d399;">₨ 0</span>
+            </div>
+
+            <!-- Cash tendered & change -->
+            <div id="cash-change-box" style="display: flex; gap: 0.5rem;">
+              <div style="flex: 1;">
+                <label style="font-size: 0.7rem; color: #94a3b8;">Wasool Shuda Cash:</label>
+                <input type="number" id="pos-cash-received" class="input" placeholder="Raqam" oninput="calcChange()">
+              </div>
+              <div style="flex: 1;">
+                <label style="font-size: 0.7rem; color: #94a3b8;">Wapas Karni Hai (Change):</label>
+                <div id="pos-change-due" style="padding: 0.5rem; background: #1e293b; border-radius: 8px; font-weight: 700; color: #34d399;">₨ 0</div>
+              </div>
+            </div>
+
+            <button class="btn btn-emerald" style="width: 100%; padding: 0.75rem; font-size: 0.9rem;" onclick="finalizeSale()">
+              ✅ Bill Mukammal Karein & Print Rasid
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. WEEKLY RECORD VIEW -->
+    <section id="view-weekly" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800;">Haftawar Record (Weekly Statement)</h2>
+          <p style="font-size: 0.8rem; color: #94a3b8;" id="weekly-dates-sub"></p>
+        </div>
+        <div style="display: flex; gap: 0.5rem;">
+          <button class="btn btn-slate" onclick="changeWeekOffset(-1)">&larr; Pichla Hafta</button>
+          <button class="btn btn-slate" onclick="changeWeekOffset(1)" id="btn-next-week">Agla Hafta &rarr;</button>
+          <button class="btn btn-emerald" onclick="window.print()">🖨️ Print Weekly Sheet</button>
+        </div>
+      </div>
+
+      <!-- Weekly KPI Strip -->
+      <div class="grid-4" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <div class="card-title">Hafte Ki Kul Bikri</div>
+          <div class="card-val" id="weekly-total-sales">₨ 0</div>
+          <div style="font-size: 0.75rem; color: #94a3b8;" id="weekly-bills-count">0 Bills</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Hafte Ke Kharchay</div>
+          <div class="card-val" style="color: #f87171;" id="weekly-total-expenses">₨ 0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Hafte Ka Khalis Nafa</div>
+          <div class="card-val" style="color: #34d399;" id="weekly-net-profit">₨ 0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Total Cash Wasooli</div>
+          <div class="card-val" style="color: #38bdf8;" id="weekly-cash-inflow">₨ 0</div>
+        </div>
+      </div>
+
+      <!-- Day-by-Day Table -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem;">Somwar Se Itwar - Rozana Ka Hisab</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Din (Day)</th>
+                <th>Tareekh</th>
+                <th class="text-center">Bills</th>
+                <th class="text-right">Bikri (Sales)</th>
+                <th class="text-right">Kharchay</th>
+                <th class="text-right">Khalis Nafa</th>
+                <th class="text-right">Cash Wasooli</th>
+              </tr>
+            </thead>
+            <tbody id="weekly-breakdown-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. MONTHLY RECORD VIEW -->
+    <section id="view-monthly" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800;">Mahana Record (Monthly Statement)</h2>
+          <p style="font-size: 0.8rem; color: #94a3b8;" id="monthly-title-sub"></p>
+        </div>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="month" id="month-picker" class="input" style="width: auto;" onchange="renderMonthlyView()">
+          <button class="btn btn-emerald" onclick="window.print()">🖨️ Print Monthly Record</button>
+        </div>
+      </div>
+
+      <!-- Monthly KPI -->
+      <div class="grid-4" style="margin-bottom: 1.5rem;">
+        <div class="card">
+          <div class="card-title">Is Mahine Ki Bikri</div>
+          <div class="card-val" id="monthly-total-sales">₨ 0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Bikne Wale Maal Ki Cost</div>
+          <div class="card-val" style="color: #cbd5e1;" id="monthly-total-cost">₨ 0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Mahane Ke Kharchay</div>
+          <div class="card-val" style="color: #f87171;" id="monthly-total-expenses">₨ 0</div>
+        </div>
+        <div class="card">
+          <div class="card-title">Mahane Ka Khalis Nafa</div>
+          <div class="card-val" style="color: #34d399;" id="monthly-net-profit">₨ 0</div>
+        </div>
+      </div>
+
+      <!-- Week-by-Week Table in the Month -->
+      <div class="card" style="margin-bottom: 1.5rem;">
+        <h3 style="font-size: 0.9rem; font-weight: 700; margin-bottom: 0.75rem;">Mahine Ke Hafton Ki Taqseem (4 Weeks Breakdown)</h3>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Hafta</th>
+                <th>Muddat (Dates)</th>
+                <th class="text-center">Bills</th>
+                <th class="text-right">Kul Bikri</th>
+                <th class="text-right">Kharchay</th>
+                <th class="text-right">Khalis Nafa</th>
+              </tr>
+            </thead>
+            <tbody id="monthly-weeks-tbody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. STOCK / INVENTORY VIEW -->
+    <section id="view-stock" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800;">Stock & Godown (Bags & Disposables)</h2>
+          <p style="font-size: 0.8rem; color: #94a3b8;">Shopping bags, plates, glasses, boxes aur packing material</p>
+        </div>
+        <button class="btn btn-emerald" onclick="openAddItemModal()">+ Nayi Cheez Shamil Karein</button>
+      </div>
+
+      <div class="table-wrap card">
+        <table>
+          <thead>
+            <tr>
+              <th>Code</th>
+              <th>Cheez Ka Naam</th>
+              <th>Category</th>
+              <th class="text-right">Khareed</th>
+              <th class="text-right">Bikri Rate</th>
+              <th class="text-center">Mojooda Stock</th>
+              <th class="text-center">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="stock-table-tbody">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 6. EXPENSES VIEW -->
+    <section id="view-expenses" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800;">Dukan Ke Kharchay</h2>
+          <p style="font-size: 0.8rem; color: #94a3b8;">Kiraya, bijli, mulazmeen ki tankhwah, chai aur transport</p>
+        </div>
+        <button class="btn btn-rose" onclick="openExpenseModal()">+ Naya Kharcha Likhein</button>
+      </div>
+
+      <div class="card table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Tareekh</th>
+              <th>Kharchay Ki Qisam</th>
+              <th>Tafseel (Notes)</th>
+              <th>Recipient</th>
+              <th class="text-right">Raqam</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="expenses-table-tbody">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 7. UDHAAR KHATA VIEW -->
+    <section id="view-khata" style="display: none;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; flex-wrap: wrap; gap: 0.5rem;">
+        <div>
+          <h2 style="font-size: 1.25rem; font-weight: 800;">Udhaar Khata & Wasooli</h2>
+          <p style="font-size: 0.8rem; color: #94a3b8;">Grahakon ka baqi hisab aur WhatsApp reminders</p>
+        </div>
+        <button class="btn btn-emerald" onclick="openPaymentModal()">+ Wasooli Darj Karein</button>
+      </div>
+
+      <div class="card table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Grahak Ka Naam</th>
+              <th>Phone Number</th>
+              <th>Pata</th>
+              <th class="text-right">Baqi Udhaar</th>
+              <th class="text-center">Action</th>
+            </tr>
+          </thead>
+          <tbody id="khata-table-tbody">
+            <!-- Rendered via JS -->
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- 8. SETTINGS & BACKUP VIEW -->
+    <section id="view-settings" style="display: none;">
+      <div class="card" style="margin-bottom: 1rem;">
+        <h3 style="font-weight: 800; font-size: 1rem; margin-bottom: 0.5rem;">Dukan Ki Maloomat</h3>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 1rem;">Ye maloomat har bill aur rasid ke ooper print hoti hain.</p>
+        <div class="grid-2">
+          <div>
+            <label style="font-size: 0.75rem; color: #94a3b8;">Dukan Ka Naam:</label>
+            <input type="text" id="setting-shop-name" class="input" value="ZamZam Disposable and Shopping bags center">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: #94a3b8;">Urdu Naam:</label>
+            <input type="text" id="setting-shop-urdu" class="input" value="زم زم ڈسپوزیبل اینڈ شاپنگ بیگز سینٹر">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: #94a3b8;">WhatsApp # 1:</label>
+            <input type="text" id="setting-phone-1" class="input" value="03145725727">
+          </div>
+          <div>
+            <label style="font-size: 0.75rem; color: #94a3b8;">WhatsApp # 2:</label>
+            <input type="text" id="setting-phone-2" class="input" value="03129077476">
+          </div>
+        </div>
+        <button class="btn btn-emerald" style="margin-top: 1rem;" onclick="saveShopSettings()">Mehfooz Karein</button>
+      </div>
+
+      <div class="card">
+        <h3 style="font-weight: 800; font-size: 1rem; margin-bottom: 0.5rem;">Offline Backup & Single-File HTML</h3>
+        <p style="font-size: 0.8rem; color: #94a3b8; margin-bottom: 1rem;">
+          Aapka data 100% offline aapke browser mein rehta hai. File download kar ke mehfooz rakhein.
+        </p>
+        <div style="display: flex; gap: 0.75rem; flex-wrap: wrap;">
+          <button class="btn btn-emerald" onclick="downloadBackupJson()">📥 Download Backup (JSON)</button>
+          <button class="btn btn-slate" onclick="downloadThisHtmlFile()">💾 Download Single-File HTML App</button>
+          <button class="btn btn-rose" onclick="wipeData()">⚠️ Reset All Data</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- RECEIPT MODAL -->
+  <div id="receipt-modal" class="modal-overlay">
+    <div class="modal-box">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;" class="no-print">
+        <h3 style="font-weight: 800;">Bill / Rasid</h3>
+        <button class="btn btn-slate" onclick="closeReceiptModal()">✕ Close</button>
+      </div>
+
+      <!-- Printable Area -->
+      <div id="printable-receipt-area">
+        <div class="receipt-paper" id="receipt-paper-content">
+          <!-- Filled via JS -->
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;" class="no-print">
+        <button class="btn btn-slate" onclick="shareReceiptWhatsApp()">WhatsApp Par Bhejein</button>
+        <button class="btn btn-emerald" onclick="window.print()">🖨️ Print Receipt</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- EXPENSE MODAL -->
+  <div id="expense-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 style="font-weight: 800; margin-bottom: 1rem;">Naya Kharcha Likhein</h3>
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div>
+          <label style="font-size: 0.75rem; color: #94a3b8;">Qisam (Category):</label>
+          <select id="exp-cat" class="input">
+            <option value="Chai & Refreshments">Chai & Refreshments</option>
+            <option value="Dukan Ka Kiraya">Dukan Ka Kiraya</option>
+            <option value="Bijli & Bills">Bijli & Bills</option>
+            <option value="Transport / Loader">Transport / Loader</option>
+            <option value="Mulazmeen Tankhwah">Mulazmeen Tankhwah</option>
+            <option value="Deegar">Deegar Kharcha</option>
+          </select>
+        </div>
+        <div>
+          <label style="font-size: 0.75rem; color: #94a3b8;">Raqam (Rs):</label>
+          <input type="number" id="exp-amount" class="input" placeholder="e.g. 500">
+        </div>
+        <div>
+          <label style="font-size: 0.75rem; color: #94a3b8;">Tafseel (Notes):</label>
+          <input type="text" id="exp-notes" class="input" placeholder="Kis cheez par kharcha hua">
+        </div>
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem;">
+          <button class="btn btn-slate" onclick="closeExpenseModal()">Cancel</button>
+          <button class="btn btn-rose" onclick="submitExpense()">Kharcha Save Karein</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WASOOLI MODAL -->
+  <div id="payment-modal" class="modal-overlay">
+    <div class="modal-box">
+      <h3 style="font-weight: 800; margin-bottom: 1rem;">Grahak Se Wasooli Darj Karein</h3>
+      <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+        <div>
+          <label style="font-size: 0.75rem; color: #94a3b8;">Grahak (Customer):</label>
+          <select id="pay-cust-select" class="input"></select>
+        </div>
+        <div>
+          <label style="font-size: 0.75rem; color: #94a3b8;">Wasool Shuda Raqam (Rs):</label>
+          <input type="number" id="pay-amount" class="input" placeholder="Raqam">
+        </div>
+        <div style="display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 0.5rem;">
+          <button class="btn btn-slate" onclick="closePaymentModal()">Cancel</button>
+          <button class="btn btn-emerald" onclick="submitPayment()">Wasooli Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JAVASCRIPT LOGIC -->
+  <script>
+    // Initial Seed Data for ZamZam Disposable
+    const DEFAULT_PRODUCTS = [
+      { id: "p1", code: "1001", name: "Shopping Bag White 8x10 (Small)", category: "Shopping Bags", cost: 330, price: 380, stock: 65, unit: "kg" },
+      { id: "p2", code: "1002", name: "Shopping Bag Color Super 10x14 (Medium)", category: "Shopping Bags", cost: 340, price: 400, stock: 80, unit: "kg" },
+      { id: "p3", code: "1003", name: "Shopping Bag Heavy Duty 14x18 (Large)", category: "Shopping Bags", cost: 350, price: 420, stock: 45, unit: "kg" },
+      { id: "p4", code: "1004", name: "D-Cut Fancy Printed Bags (100 pcs)", category: "Shopping Bags", cost: 460, price: 560, stock: 25, unit: "pack" },
+      { id: "p5", code: "1005", name: "Garbage Bags Black Heavy 30x40", category: "Garbage Bags", cost: 220, price: 280, stock: 40, unit: "roll" },
+      { id: "p6", code: "1006", name: "Disposable Foam Plates 10 inch (100 Pcs)", category: "Disposable Crockery", cost: 520, price: 620, stock: 20, unit: "pack" },
+      { id: "p7", code: "1007", name: "Disposable Foam Plates Biryani (100 Pcs)", category: "Disposable Crockery", cost: 380, price: 460, stock: 35, unit: "pack" },
+      { id: "p8", code: "1008", name: "Disposable Plastic Glasses 250ml (50 Pcs)", category: "Disposable Crockery", cost: 140, price: 180, stock: 50, unit: "pack" },
+      { id: "p9", code: "1009", name: "Paper Tea Cups 200ml Chai (50 Pcs)", category: "Disposable Crockery", cost: 110, price: 150, stock: 60, unit: "pack" },
+      { id: "p10", code: "1010", name: "Disposable Spoons Heavy (100 Pcs)", category: "Disposable Crockery", cost: 160, price: 220, stock: 45, unit: "pack" },
+      { id: "p11", code: "1011", name: "Food Container 500ml with Lid (Carton 250)", category: "Food Packaging", cost: 1850, price: 2200, stock: 12, unit: "carton" },
+      { id: "p12", code: "1012", name: "Aluminum Foil Roll 1kg", category: "Food Packaging", cost: 750, price: 890, stock: 15, unit: "roll" },
+      { id: "p13", code: "1013", name: "Packing Tape 2 inch Transparent (Dozen)", category: "Packaging", cost: 1100, price: 1350, stock: 10, unit: "dozen" }
+    ];
+
+    const DEFAULT_CUSTOMERS = [
+      { id: "c1", name: "Al-Madina Biryani & Pulao Center", phone: "0301-7654321", address: "General Bus Stand", balance: 5800 },
+      { id: "c2", name: "Gourmet Sweets & Bakers", phone: "0321-9876543", address: "Commercial Chowk", balance: 14800 },
+      { id: "c3", name: "Khan Chai Hotel", phone: "0333-5551234", address: "Truck Stand", balance: 3200 }
+    ];
+
+    // LocalStorage State Getters & Setters
+    let shop = JSON.parse(localStorage.getItem('zz_shop') || 'null') || {
+      name: "ZamZam Disposable and Shopping bags center",
+      urdu: "زم زم ڈسپوزیبل اینڈ شاپنگ بیگز سینٹر",
+      phone1: "03145725727",
+      phone2: "03129077476",
+      address: "Main Wholesale Market"
+    };
+
+    let products = JSON.parse(localStorage.getItem('zz_products') || 'null') || DEFAULT_PRODUCTS;
+    let customers = JSON.parse(localStorage.getItem('zz_customers') || 'null') || DEFAULT_CUSTOMERS;
+    let sales = JSON.parse(localStorage.getItem('zz_sales') || 'null') || [];
+    let expenses = JSON.parse(localStorage.getItem('zz_expenses') || 'null') || [];
+    let cart = [];
+    let weekOffset = 0;
+    let activeSaleForReceipt = null;
+
+    function saveState() {
+      localStorage.setItem('zz_shop', JSON.stringify(shop));
+      localStorage.setItem('zz_products', JSON.stringify(products));
+      localStorage.setItem('zz_customers', JSON.stringify(customers));
+      localStorage.setItem('zz_sales', JSON.stringify(sales));
+      localStorage.setItem('zz_expenses', JSON.stringify(expenses));
+    }
+
+    // Tab Navigation
+    function switchTab(tabId) {
+      const tabs = ['dashboard', 'pos', 'weekly', 'monthly', 'stock', 'expenses', 'khata', 'settings'];
+      tabs.forEach(t => {
+        const el = document.getElementById(`view-${t}`);
+        if (el) el.style.display = (t === tabId ? 'block' : 'none');
+      });
+
+      document.querySelectorAll('.tab-btn').forEach((btn, idx) => {
+        btn.classList.toggle('active', tabs[idx] === tabId);
+      });
+
+      if (tabId === 'dashboard') renderDashboard();
+      if (tabId === 'pos') renderPosProducts();
+      if (tabId === 'weekly') renderWeeklyView();
+      if (tabId === 'monthly') renderMonthlyView();
+      if (tabId === 'stock') renderStockView();
+      if (tabId === 'expenses') renderExpensesView();
+      if (tabId === 'khata') renderKhataView();
+    }
+
+    // Helpers
+    function getTodayStr(offset = 0) {
+      const d = new Date();
+      d.setDate(d.getDate() + offset);
+      return d.toISOString().split('T')[0];
+    }
+
+    function formatRs(num) {
+      return '₨ ' + Number(num || 0).toLocaleString();
+    }
+
+    // 1. DASHBOARD
+    function renderDashboard() {
+      const today = getTodayStr(0);
+      document.getElementById('dash-date-str').textContent = new Date().toLocaleDateString('en-GB', { weekday: 'long', year: 'numeric', month: 'short', day: 'numeric' });
+
+      const todaySales = sales.filter(s => s.date === today);
+      const todaySalesTotal = todaySales.reduce((acc, s) => acc + s.total, 0);
+      const todaySalesProfit = todaySales.reduce((acc, s) => acc + s.profit, 0);
+
+      const todayExp = expenses.filter(e => e.date === today);
+      const todayExpTotal = todayExp.reduce((acc, e) => acc + e.amount, 0);
+
+      const totalUdhaar = customers.reduce((acc, c) => acc + (c.balance || 0), 0);
+
+      document.getElementById('dash-today-sales').textContent = formatRs(todaySalesTotal);
+      document.getElementById('dash-sales-count').textContent = `${todaySales.length} Bills Banaye`;
+      document.getElementById('dash-today-expenses').textContent = formatRs(todayExpTotal);
+      document.getElementById('dash-today-profit').textContent = formatRs(todaySalesProfit - todayExpTotal);
+      document.getElementById('dash-total-udhaar').textContent = formatRs(totalUdhaar);
+
+      const tbody = document.getElementById('dash-recent-sales-tbody');
+      tbody.innerHTML = '';
+      if (todaySales.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center" style="color: #64748b; padding: 2rem;">Aaj abhi tak koi bill nahi bana. "+ Naya Bill" par click karein.</td></tr>';
+        return;
+      }
+
+      todaySales.slice(-5).reverse().forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 700; color: #fff;">${s.invoiceNo}</td>
+          <td style="color: #94a3b8;">${s.time}</td>
+          <td style="font-weight: 600;">${s.customerName}</td>
+          <td><span style="font-size: 0.75rem; padding: 2px 6px; border-radius: 4px; background: ${s.paymentMode === 'credit' ? '#78350f' : '#064e3b'}; color: #fff;">${s.paymentMode.toUpperCase()}</span></td>
+          <td class="text-right" style="font-weight: 700;">${formatRs(s.total)}</td>
+          <td class="text-right" style="color: #34d399; font-weight: 700;">+${formatRs(s.profit)}</td>
+          <td class="text-center">
+            <button class="btn btn-slate" style="padding: 2px 8px; font-size: 0.75rem;" onclick='viewReceiptById("${s.id}")'>👁️ Rasid</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 2. POS BILLING
+    function renderPosProducts() {
+      const q = (document.getElementById('pos-search').value || '').toLowerCase();
+      const grid = document.getElementById('pos-products-grid');
+      grid.innerHTML = '';
+
+      products.filter(p => p.name.toLowerCase().includes(q) || p.code.includes(q)).forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.style.cursor = 'pointer';
+        card.style.display = 'flex';
+        card.style.flexDirection = 'column';
+        card.style.justifyContent = 'space-between';
+        card.onclick = () => addToCart(p);
+        card.innerHTML = `
+          <div>
+            <div style="font-size: 0.75rem; color: #94a3b8; font-family: monospace;">#${p.code} · ${p.category}</div>
+            <div style="font-weight: 700; font-size: 0.85rem; color: #fff; margin: 0.25rem 0;">${p.name}</div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem; border-top: 1px solid #1e293b; padding-top: 0.5rem;">
+            <span style="font-weight: 800; color: #34d399;">${formatRs(p.price)} / ${p.unit}</span>
+            <span style="font-size: 0.75rem; color: #94a3b8;">Stock: ${p.stock}</span>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function addToCart(p) {
+      const ex = cart.find(it => it.id === p.id);
+      if (ex) { ex.qty += 1; }
+      else {
+        cart.push({ id: p.id, name: p.name, price: p.price, cost: p.cost, unit: p.unit, qty: 1 });
+      }
+      renderCart();
+    }
+
+    function updateCartQty(id, delta) {
+      const item = cart.find(it => it.id === id);
+      if (!item) return;
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(it => it.id !== id);
+      }
+      renderCart();
+    }
+
+    function clearCart() { cart = []; renderCart(); }
+
+    function renderCart() {
+      const container = document.getElementById('pos-cart-list');
+      container.innerHTML = '';
+      if (cart.length === 0) {
+        container.innerHTML = '<div style="padding: 2rem; text-align: center; color: #64748b; font-size: 0.8rem;">Bill mein koi item shamil nahi hai. Bayen taraf se items par click karein.</div>';
+        updateCartTotals();
+        return;
+      }
+
+      cart.forEach(it => {
+        const row = document.createElement('div');
+        row.style = 'display: flex; justify-content: space-between; align-items: center; padding: 0.4rem 0; border-bottom: 1px solid #1e293b; font-size: 0.8rem;';
+        row.innerHTML = `
+          <div style="flex: 1; padding-right: 0.5rem;">
+            <div style="font-weight: 700; color: #fff;">${it.name}</div>
+            <div style="font-size: 0.7rem; color: #94a3b8;">${formatRs(it.price)} x ${it.qty} ${it.unit}</div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 0.3rem;">
+            <button class="btn btn-slate" style="padding: 2px 6px;" onclick="updateCartQty('${it.id}', -1)">-</button>
+            <span style="font-weight: 700; width: 24px; text-align: center;">${it.qty}</span>
+            <button class="btn btn-slate" style="padding: 2px 6px;" onclick="updateCartQty('${it.id}', 1)">+</button>
+          </div>
+          <div style="font-weight: 800; text-align: right; width: 80px;">${formatRs(it.price * it.qty)}</div>
+        `;
+        container.appendChild(row);
+      });
+
+      updateCartTotals();
+    }
+
+    function updateCartTotals() {
+      const subtotal = cart.reduce((acc, it) => acc + (it.price * it.qty), 0);
+      const discount = Number(document.getElementById('pos-discount').value || 0);
+      const net = Math.max(0, subtotal - discount);
+
+      document.getElementById('pos-net-total').textContent = formatRs(net);
+      calcChange();
+    }
+
+    function calcChange() {
+      const subtotal = cart.reduce((acc, it) => acc + (it.price * it.qty), 0);
+      const discount = Number(document.getElementById('pos-discount').value || 0);
+      const net = Math.max(0, subtotal - discount);
+      const rcv = Number(document.getElementById('pos-cash-received').value || 0);
+      const change = rcv > net ? rcv - net : 0;
+      document.getElementById('pos-change-due').textContent = formatRs(change);
+    }
+
+    function finalizeSale() {
+      if (cart.length === 0) { alert('Pehle bill mein items add karein!'); return; }
+
+      const subtotal = cart.reduce((acc, it) => acc + (it.price * it.qty), 0);
+      const costTotal = cart.reduce((acc, it) => acc + (it.cost * it.qty), 0);
+      const discount = Number(document.getElementById('pos-discount').value || 0);
+      const net = Math.max(0, subtotal - discount);
+      const profit = net - costTotal;
+
+      const custName = document.getElementById('pos-cust-name').value.trim() || 'Aam Grahak';
+      const custPhone = document.getElementById('pos-cust-phone').value.trim();
+      const mode = document.getElementById('pos-payment-mode').value;
+      const rcv = Number(document.getElementById('pos-cash-received').value || 0);
+
+      const invoiceNo = 'ZZ-' + (1001 + sales.length);
+      const d = new Date();
+      const time = d.toTimeString().substring(0, 5);
+
+      let paid = net;
+      let balanceDue = 0;
+      if (mode === 'credit') {
+        paid = rcv;
+        balanceDue = Math.max(0, net - rcv);
+      }
+
+      const saleRecord = {
+        id: 's_' + Date.now(),
+        invoiceNo,
+        date: getTodayStr(0),
+        time,
+        customerName: custName,
+        customerPhone: custPhone,
+        items: [...cart],
+        subtotal,
+        discount,
+        total: net,
+        profit,
+        paymentMode: mode,
+        amountPaid: paid,
+        balanceDue
+      };
+
+      // Deduct stock
+      cart.forEach(it => {
+        const prod = products.find(p => p.id === it.id);
+        if (prod) prod.stock = Math.max(0, prod.stock - it.qty);
+      });
+
+      // Update customer balance if credit
+      if (balanceDue > 0) {
+        let cust = customers.find(c => c.name.toLowerCase() === custName.toLowerCase());
+        if (cust) {
+          cust.balance += balanceDue;
+        } else {
+          customers.push({
+            id: 'c_' + Date.now(),
+            name: custName,
+            phone: custPhone,
+            address: '',
+            balance: balanceDue
+          });
+        }
+      }
+
+      sales.push(saleRecord);
+      saveState();
+
+      // Show receipt
+      activeSaleForReceipt = saleRecord;
+      showReceipt(saleRecord);
+
+      // Reset
+      clearCart();
+      document.getElementById('pos-cust-name').value = '';
+      document.getElementById('pos-cust-phone').value = '';
+      document.getElementById('pos-discount').value = '0';
+      document.getElementById('pos-cash-received').value = '';
+    }
+
+    // 3. RECEIPT MAKER
+    function showReceipt(sale) {
+      activeSaleForReceipt = sale;
+      const paper = document.getElementById('receipt-paper-content');
+
+      let itemsHtml = '';
+      sale.items.forEach((it, idx) => {
+        itemsHtml += `
+          <div style="display: flex; justify-content: space-between; margin-bottom: 2px;">
+            <span>${idx + 1}. ${it.name} (${it.qty} ${it.unit})</span>
+            <span style="font-weight: 700;">Rs.${(it.price * it.qty).toLocaleString()}</span>
+          </div>
+        `;
+      });
+
+      const isPaid = sale.balanceDue <= 0;
+      paper.innerHTML = `
+        <div style="background: linear-gradient(135deg, #064e3b, #059669); color: white; padding: 12px; border-radius: 10px; text-align: center; margin-bottom: 10px; position: relative;">
+          <div style="width: 54px; height: 54px; border-radius: 12px; background: #fff; padding: 2px; margin: 0 auto 6px auto; overflow: hidden; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">
+            <img src="/zamzam_logo.png" alt="ZamZam Logo" style="width: 100%; height: 100%; object-fit: contain;">
+          </div>
+          <div style="font-size: 15px; font-weight: 900; letter-spacing: 0.5px; text-transform: uppercase;">${shop.name}</div>
+          <div style="font-size: 12px; font-weight: bold; color: #a7f3d0; margin-top: 2px;">${shop.urdu}</div>
+          <div style="font-size: 9px; color: #e2e8f0; margin-top: 2px;">Disposable Crockery & Shopping Bags</div>
+          <div style="display: inline-block; background: rgba(0,0,0,0.25); border: 1px solid rgba(255,255,255,0.3); border-radius: 20px; padding: 2px 10px; font-size: 10px; font-weight: bold; margin-top: 6px; color: #fef08a;">
+            📞 WhatsApp: ${shop.phone1} · ${shop.phone2}
+          </div>
+        </div>
+
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; font-size: 11px; margin-bottom: 8px; line-height: 1.5;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="background: #0f172a; color: white; padding: 1px 6px; border-radius: 4px; font-family: monospace; font-weight: bold;">BILL #${sale.invoiceNo}</span>
+            <span style="color: #64748b;">${sale.date} (${sale.time})</span>
+          </div>
+          <div style="margin-top: 4px; font-weight: bold; color: #0f172a;">Grahak: ${sale.customerName}</div>
+          ${sale.customerPhone ? `<div style="color: #475569; font-family: monospace;">Mobile: ${sale.customerPhone}</div>` : ''}
+        </div>
+
+        <div style="border-bottom: 2px solid #059669; padding-bottom: 4px; margin-bottom: 6px; font-weight: 800; font-size: 10px; color: #065f46; text-transform: uppercase;">
+          Ashya / Tafseel (Items):
+        </div>
+        <div style="font-size: 11px; margin: 6px 0;">
+          ${itemsHtml}
+        </div>
+
+        <div style="border-top: 2px dashed #cbd5e1; padding-top: 8px; font-size: 11px; line-height: 1.6;">
+          <div style="display: flex; justify-content: space-between; color: #64748b;">
+            <span>Meezan (Subtotal):</span>
+            <span style="font-weight: 600;">Rs. ${sale.subtotal.toLocaleString()}</span>
+          </div>
+          ${sale.discount > 0 ? `
+            <div style="display: flex; justify-content: space-between; color: #059669; font-weight: bold; background: #ecfdf5; padding: 2px 6px; border-radius: 4px; margin: 2px 0;">
+              <span>🎁 Chhoot (Discount):</span>
+              <span>-Rs. ${sale.discount.toLocaleString()}</span>
+            </div>
+          ` : ''}
+          <div style="display: flex; justify-content: space-between; background: linear-gradient(90deg, #059669, #0d9488); color: white; padding: 8px 10px; border-radius: 8px; font-weight: 900; font-size: 14px; margin: 6px 0;">
+            <span>KUL RAQAM:</span>
+            <span>Rs. ${sale.total.toLocaleString()}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; color: #334155;">
+            <span>Wasool Hui (${sale.paymentMode.toUpperCase()}):</span>
+            <span style="font-weight: bold; color: #059669;">Rs. ${sale.amountPaid.toLocaleString()}</span>
+          </div>
+          ${sale.balanceDue > 0 ? `
+            <div style="display: flex; justify-content: space-between; font-weight: 900; color: #991b1b; background: #fee2e2; border: 1px solid #f87171; padding: 4px 8px; border-radius: 6px; margin-top: 4px;">
+              <span>⚠️ Baqi Udhaar:</span>
+              <span>Rs. ${sale.balanceDue.toLocaleString()}</span>
+            </div>
+          ` : `
+            <div style="text-align: center; font-weight: bold; margin-top: 6px; color: #047857; background: #ecfdf5; border: 1px solid #6ee7b7; padding: 4px; border-radius: 6px;">
+              ✓ Puri Raqam Ada Hai (PAID IN FULL)
+            </div>
+          `}
+        </div>
+
+        <div style="text-align: center; margin-top: 10px; border-top: 1px dashed #94a3b8; padding-top: 6px; font-size: 10px; color: #64748b;">
+          <div>تشریف آوری کا شکریہ! خریدا ہوا مال واپس یا تبدیل ہو سکتا ہے۔</div>
+          <div style="font-weight: bold; margin-top: 2px; color: #0f172a;">ZamZam Disposable & Shopping Bags Center</div>
+        </div>
+      `;
+
+      document.getElementById('receipt-modal').classList.add('open');
+    }
+
+    function closeReceiptModal() { document.getElementById('receipt-modal').classList.remove('open'); }
+    function viewReceiptById(id) {
+      const s = sales.find(x => x.id === id);
+      if (s) showReceipt(s);
+    }
+
+    function shareReceiptWhatsApp() {
+      if (!activeSaleForReceipt) return;
+      const s = activeSaleForReceipt;
+      const text = `*${shop.name}*\nWhatsApp: ${shop.phone1} / ${shop.phone2}\nBill #: ${s.invoiceNo}\nTareekh: ${s.date}\nGrahak: ${s.customerName}\nKul Raqam: Rs.${s.total}\nWasool: Rs.${s.amountPaid}\nBaqi Udhaar: Rs.${s.balanceDue}\nShukriya!`;
+      window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank');
+    }
+
+    // 4. WEEKLY RECORD
+    function renderWeeklyView() {
+      const current = new Date();
+      current.setDate(current.getDate() + (weekOffset * 7));
+      const day = current.getDay();
+      const diffToMonday = current.getDate() - day + (day === 0 ? -6 : 1);
+      const monday = new Date(current.setDate(diffToMonday));
+      const sunday = new Date(monday);
+      sunday.setDate(monday.getDate() + 6);
+
+      const start = monday.toISOString().split('T')[0];
+      const end = sunday.toISOString().split('T')[0];
+
+      document.getElementById('weekly-dates-sub').textContent = `${start} se ${end} tak ka mukammal record`;
+      document.getElementById('btn-next-week').disabled = (weekOffset >= 0);
+
+      const weekSales = sales.filter(s => s.date >= start && s.date <= end);
+      const weekExp = expenses.filter(e => e.date >= start && e.date <= end);
+
+      const totalSales = weekSales.reduce((a, s) => a + s.total, 0);
+      const totalExp = weekExp.reduce((a, e) => a + e.amount, 0);
+      const totalProfit = weekSales.reduce((a, s) => a + s.profit, 0) - totalExp;
+      const totalPaid = weekSales.reduce((a, s) => a + s.amountPaid, 0);
+
+      document.getElementById('weekly-total-sales').textContent = formatRs(totalSales);
+      document.getElementById('weekly-bills-count').textContent = `${weekSales.length} Bills Banaye`;
+      document.getElementById('weekly-total-expenses').textContent = formatRs(totalExp);
+      document.getElementById('weekly-net-profit').textContent = formatRs(totalProfit);
+      document.getElementById('weekly-cash-inflow').textContent = formatRs(totalPaid);
+
+      // Day-by-Day Table
+      const tbody = document.getElementById('weekly-breakdown-tbody');
+      tbody.innerHTML = '';
+      const curr = new Date(monday);
+      for (let i = 0; i < 7; i++) {
+        const dStr = curr.toISOString().split('T')[0];
+        const dayName = curr.toLocaleDateString('en-US', { weekday: 'short' });
+        const dSales = sales.filter(s => s.date === dStr);
+        const dExp = expenses.filter(e => e.date === dStr);
+
+        const sTotal = dSales.reduce((a, s) => a + s.total, 0);
+        const eTotal = dExp.reduce((a, e) => a + e.amount, 0);
+        const net = dSales.reduce((a, s) => a + s.profit, 0) - eTotal;
+        const paid = dSales.reduce((a, s) => a + s.amountPaid, 0);
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 700; color: #fff;">${dayName}</td>
+          <td style="color: #94a3b8; font-family: monospace;">${dStr}</td>
+          <td class="text-center">${dSales.length}</td>
+          <td class="text-right" style="font-weight: 700;">${formatRs(sTotal)}</td>
+          <td class="text-right" style="color: #f87171;">-${formatRs(eTotal)}</td>
+          <td class="text-right" style="color: #34d399; font-weight: 700;">${formatRs(net)}</td>
+          <td class="text-right" style="color: #38bdf8;">${formatRs(paid)}</td>
+        `;
+        tbody.appendChild(tr);
+        curr.setDate(curr.getDate() + 1);
+      }
+    }
+
+    function changeWeekOffset(delta) {
+      weekOffset += delta;
+      renderWeeklyView();
+    }
+
+    // 5. MONTHLY RECORD
+    function renderMonthlyView() {
+      const picker = document.getElementById('month-picker');
+      if (!picker.value) {
+        picker.value = getTodayStr(0).slice(0, 7);
+      }
+      const ym = picker.value;
+      const [year, month] = ym.split('-');
+      const lastDay = new Date(parseInt(year), parseInt(month), 0).getDate();
+      const start = `${ym}-01`;
+      const end = `${ym}-${String(lastDay).padStart(2, '0')}`;
+
+      document.getElementById('monthly-title-sub').textContent = `${ym} ka pura mahana hisab kitab`;
+
+      const mSales = sales.filter(s => s.date >= start && s.date <= end);
+      const mExp = expenses.filter(e => e.date >= start && e.date <= end);
+
+      const totalSales = mSales.reduce((a, s) => a + s.total, 0);
+      const totalCost = mSales.reduce((a, s) => a + (s.total - s.profit), 0);
+      const totalExp = mExp.reduce((a, e) => a + e.amount, 0);
+      const netProfit = mSales.reduce((a, s) => a + s.profit, 0) - totalExp;
+
+      document.getElementById('monthly-total-sales').textContent = formatRs(totalSales);
+      document.getElementById('monthly-total-cost').textContent = formatRs(totalCost);
+      document.getElementById('monthly-total-expenses').textContent = formatRs(totalExp);
+      document.getElementById('monthly-net-profit').textContent = formatRs(netProfit);
+
+      // Weeks in month
+      const weeks = [
+        { name: "Hafta 1 (1-7)", s: `${ym}-01`, e: `${ym}-07` },
+        { name: "Hafta 2 (8-14)", s: `${ym}-08`, e: `${ym}-14` },
+        { name: "Hafta 3 (15-21)", s: `${ym}-15`, e: `${ym}-21` },
+        { name: "Hafta 4 (22-End)", s: `${ym}-22`, e: end }
+      ];
+
+      const tbody = document.getElementById('monthly-weeks-tbody');
+      tbody.innerHTML = '';
+      weeks.forEach(w => {
+        const wSales = sales.filter(s => s.date >= w.s && s.date <= w.e);
+        const wExp = expenses.filter(e => e.date >= w.s && e.date <= w.e);
+        const sTotal = wSales.reduce((a, s) => a + s.total, 0);
+        const eTotal = wExp.reduce((a, e) => a + e.amount, 0);
+        const net = wSales.reduce((a, s) => a + s.profit, 0) - eTotal;
+
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 700; color: #fff;">${w.name}</td>
+          <td style="color: #94a3b8; font-family: monospace;">${w.s} ta ${w.e}</td>
+          <td class="text-center">${wSales.length}</td>
+          <td class="text-right" style="font-weight: 700;">${formatRs(sTotal)}</td>
+          <td class="text-right" style="color: #f87171;">-${formatRs(eTotal)}</td>
+          <td class="text-right" style="color: #34d399; font-weight: 700;">${formatRs(net)}</td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // 6. STOCK / EXPENSES / KHATA TABLES
+    function renderStockView() {
+      const tbody = document.getElementById('stock-table-tbody');
+      tbody.innerHTML = '';
+      products.forEach(p => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color: #94a3b8; font-family: monospace;">#${p.code}</td>
+          <td style="font-weight: 700; color: #fff;">${p.name}</td>
+          <td>${p.category}</td>
+          <td class="text-right">${formatRs(p.cost)}</td>
+          <td class="text-right" style="font-weight: 700; color: #34d399;">${formatRs(p.price)}</td>
+          <td class="text-center"><span style="padding: 2px 8px; border-radius: 4px; background: #064e3b; color: #a7f3d0; font-weight: 700;">${p.stock} ${p.unit}</span></td>
+          <td class="text-center">
+            <button class="btn btn-slate" style="padding: 2px 6px; font-size: 0.7rem;" onclick="addStockPrompt('${p.id}')">+ Maal Aya</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function addStockPrompt(id) {
+      const p = products.find(x => x.id === id);
+      if (!p) return;
+      const qty = prompt(`Kitna naya maal aya for "${p.name}" (${p.unit})?`, "10");
+      if (qty && Number(qty) > 0) {
+        p.stock += Number(qty);
+        saveState();
+        renderStockView();
+      }
+    }
+
+    function renderExpensesView() {
+      const tbody = document.getElementById('expenses-table-tbody');
+      tbody.innerHTML = '';
+      if (expenses.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center" style="padding: 2rem; color: #64748b;">Abhi tak koi kharcha darj nahi.</td></tr>';
+        return;
+      }
+      expenses.slice().reverse().forEach((e, idx) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color: #94a3b8;">${e.date}</td>
+          <td style="font-weight: 700; color: #fff;">${e.category}</td>
+          <td>${e.notes || '—'}</td>
+          <td style="color: #cbd5e1;">${e.recipient || '—'}</td>
+          <td class="text-right" style="color: #f87171; font-weight: 700;">-${formatRs(e.amount)}</td>
+          <td class="text-center">
+            <button class="btn btn-slate" style="padding: 2px 6px;" onclick="deleteExpense(${idx})">🗑️</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function renderKhataView() {
+      const tbody = document.getElementById('khata-table-tbody');
+      tbody.innerHTML = '';
+      customers.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="font-weight: 700; color: #fff;">${c.name}</td>
+          <td style="font-family: monospace;">${c.phone || '—'}</td>
+          <td style="color: #94a3b8;">${c.address || '—'}</td>
+          <td class="text-right" style="font-weight: 800; color: ${c.balance > 0 ? '#fbbf24' : '#34d399'};">${formatRs(c.balance)}</td>
+          <td class="text-center">
+            ${c.balance > 0 ? `<button class="btn btn-emerald" style="padding: 2px 8px; font-size: 0.75rem;" onclick="remindCust('${c.name}', ${c.balance}, '${c.phone}')">WhatsApp</button>` : '—'}
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function remindCust(name, bal, phone) {
+      const msg = `Assalam-o-Alaikum, *${shop.name}* ki taraf se ittila hai ke aapke zimme Rs.${bal.toLocaleString()} baqi hain. Meherbani farma kar adaigi farma dein. Shukriya!`;
+      if (phone) {
+        window.open(`https://wa.me/92${phone.replace(/\\D/g,'').slice(-10)}?text=${encodeURIComponent(msg)}`, '_blank');
+      } else {
+        alert("Customer ka phone number nahi hai. Message copy kar diya gaya hai.");
+        navigator.clipboard.writeText(msg);
+      }
+    }
+
+    // Modals Handling
+    function openExpenseModal() { document.getElementById('expense-modal').classList.add('open'); }
+    function closeExpenseModal() { document.getElementById('expense-modal').classList.remove('open'); }
+    function submitExpense() {
+      const cat = document.getElementById('exp-cat').value;
+      const amt = Number(document.getElementById('exp-amount').value || 0);
+      const notes = document.getElementById('exp-notes').value.trim();
+      if (!amt || amt <= 0) { alert('Raqam darj karein!'); return; }
+
+      expenses.push({
+        id: 'e_' + Date.now(),
+        date: getTodayStr(0),
+        category: cat,
+        amount: amt,
+        notes: notes,
+        recipient: ''
+      });
+      saveState();
+      closeExpenseModal();
+      document.getElementById('exp-amount').value = '';
+      document.getElementById('exp-notes').value = '';
+      renderDashboard();
+    }
+
+    function openPaymentModal() {
+      const sel = document.getElementById('pay-cust-select');
+      sel.innerHTML = '';
+      customers.filter(c => c.balance > 0).forEach(c => {
+        const opt = document.createElement('option');
+        opt.value = c.id;
+        opt.textContent = `${c.name} (Baqi: Rs.${c.balance.toLocaleString()})`;
+        sel.appendChild(opt);
+      });
+      if (customers.filter(c => c.balance > 0).length === 0) {
+        alert("Kisi grahak ke zimme koi udhaar baqi nahi hai!");
+        return;
+      }
+      document.getElementById('payment-modal').classList.add('open');
+    }
+    function closePaymentModal() { document.getElementById('payment-modal').classList.remove('open'); }
+    function submitPayment() {
+      const cId = document.getElementById('pay-cust-select').value;
+      const amt = Number(document.getElementById('pay-amount').value || 0);
+      if (!amt || amt <= 0) { alert('Raqam darj karein!'); return; }
+      const cust = customers.find(c => c.id === cId);
+      if (cust) {
+        cust.balance = Math.max(0, cust.balance - amt);
+        saveState();
+        closePaymentModal();
+        document.getElementById('pay-amount').value = '';
+        renderDashboard();
+        renderKhataView();
+      }
+    }
+
+    // Save Shop Settings
+    function saveShopSettings() {
+      shop.name = document.getElementById('setting-shop-name').value.trim();
+      shop.urdu = document.getElementById('setting-shop-urdu').value.trim();
+      shop.phone1 = document.getElementById('setting-phone-1').value.trim();
+      shop.phone2 = document.getElementById('setting-phone-2').value.trim();
+      saveState();
+      alert('Maloomat kamyabi se mehfooz ho gayin!');
+      location.reload();
+    }
+
+    // 7. DOWNLOAD AS STANDALONE HTML FILE
+    function downloadThisHtmlFile() {
+      const htmlContent = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+      const blob = new Blob([htmlContent], { type: 'text/html;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'ZamZam_Disposable_App_Offline.html';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function downloadBackupJson() {
+      const data = { shop, products, customers, sales, expenses, exportedAt: new Date().toISOString() };
+      const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `zamzam_backup_${getTodayStr(0)}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    function wipeData() {
+      if (confirm('Kya aap waqai sara data reset karna chahte hain?')) {
+        localStorage.clear();
+        location.reload();
+      }
+    }
+
+    // Init
+    window.addEventListener('DOMContentLoaded', () => {
+      renderDashboard();
+    });
+  </script>
+</body>
+</html>

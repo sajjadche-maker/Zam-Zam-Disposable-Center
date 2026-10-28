@@ -1,0 +1,11 @@
+code,name,name_urdu,category,cost_price,sale_price,stock_qty,unit,min_alert
+1001,Shopping Bag White 14x18,شاپنگ بیگ سفید بڑا,Shopping Bags,450,550,50,kg,10
+1002,Shopping Bag Color 10x14,شاپنگ بیگ رنگین,Shopping Bags,480,590,35,kg,8
+1003,Disposable Water Glass 250ml,ڈسپوزیبل پانی گلاس,Disposable Crockery,180,240,100,pack,20
+1004,Plastic Chai Cups White 100pc,چائے کے کپ سفید,Disposable Crockery,130,170,80,pack,15
+1005,Foam Plates Large 50pc,فوم پلیٹ بڑی,Disposable Crockery,260,330,45,pack,10
+1006,Plastic Spoons White 100pc,پلاسٹک چمچ سفید,Disposable Crockery,110,150,60,pack,12
+1007,Transparent Packing Tape 2 inch,پیکنگ ٹیپ شفاف,Packaging & Rolls,85,120,75,roll,15
+1008,Food Container 1000ml with Lid,کھانے کا ڈبہ ڈھکن والا,Packaging & Rolls,380,480,30,pack,6
+1009,Garbage Bags Heavy Duty XL,کوڑا کرکٹ تھیلے,General,240,320,25,pack,5
+1010,Aluminium Foil Roll 25m,فوائل پیپر رول,Packaging & Rolls,310,400,20,roll,5

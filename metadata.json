@@ -1,0 +1,6 @@
+{
+  "name": "Karobar Khata - Business Ledger & Inventory",
+  "description": "Complete offline-ready business ledger for sales, expenses, stock management, daily reports, customer credit, and PIN lock security.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
